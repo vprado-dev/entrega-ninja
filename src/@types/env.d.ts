@@ -3,5 +3,6 @@ declare namespace NodeJS {
     AUTH_TOKEN: string;
     GUILD_ID: string;
     CLIENT_ID: string;
+    REQUEST_TOKEN: string;
   }
 }
