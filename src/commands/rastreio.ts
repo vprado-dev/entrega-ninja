@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { fetchTrackingService } from "../services/rastreioService";
 
-const ping = {
+const rastreio = {
   data: new SlashCommandBuilder()
     .setName("rastreio")
     .setDescription("Rastreia sua encomenda")
@@ -19,4 +19,4 @@ const ping = {
   },
 };
 
-export default ping;
+export default rastreio;
