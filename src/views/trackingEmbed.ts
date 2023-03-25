@@ -1,5 +1,11 @@
+import { format } from "date-fns";
 import { EmbedBuilder } from "discord.js";
 import { TrackingProps } from "../@types/TrackingProps";
+
+enum TipoUnidade {
+  TCE = "Unidade de Tratamento",
+  CDD = "Unidade de Distribuição",
+}
 
 export const trackingEmbed = ({
   descricao,
@@ -8,11 +14,11 @@ export const trackingEmbed = ({
   unidadeDestino,
 }: TrackingProps) => {
   const date = new Date(dtHrCriado);
-  console.log(unidadeDestino);
   const fields = [
     {
       name: "Estado atual",
       value: `**${descricao}**`,
+      inline: false,
     },
     {
       name: "Data",
@@ -21,14 +27,32 @@ export const trackingEmbed = ({
     },
     {
       name: "Horário",
-      value: `${date.getHours()}:${date.getMinutes()}`,
+      value: `${format(date, "HH:mm")}`,
       inline: true,
     },
-    {
+  ];
+  if (unidadeDestino) {
+    fields.push(
+      {
+        name: "**Origem**",
+        value: `${unidade.tipo} - ${unidade.endereco.cidade} (${unidade.endereco.uf})`,
+        inline: false,
+      },
+      {
+        name: "**Destino**",
+        value: `${
+          TipoUnidade[unidadeDestino.tipo as keyof typeof TipoUnidade]
+        } - ${unidade.endereco.cidade} (${unidade.endereco.uf})`,
+        inline: false,
+      },
+    );
+  } else {
+    fields.push({
       name: "Local",
       value: `${unidade.tipo} - ${unidade.endereco.cidade} (${unidade.endereco.uf})`,
-    },
-  ];
+      inline: false,
+    });
+  }
   const embedReply = new EmbedBuilder().setColor("#ea6329").addFields(fields);
 
   return embedReply;

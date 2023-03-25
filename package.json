@@ -24,6 +24,7 @@
     "@discordjs/builders": "^1.5.0",
     "@discordjs/rest": "^1.6.0",
     "@types/node-cache": "^4.2.5",
+    "date-fns": "^2.29.3",
     "discord-api-types": "^0.37.36",
     "discord.js": "^14.8.0",
     "dotenv": "^16.0.3",

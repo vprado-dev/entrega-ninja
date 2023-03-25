@@ -21,9 +21,10 @@ const rastreio = {
       descricao: lastUpdate.descricao,
       dtHrCriado: lastUpdate.dtHrCriado,
       unidade: lastUpdate.unidade,
+      unidadeDestino: lastUpdate.unidadeDestino,
     });
 
-    return interaction.channel.send({ embeds: [embed] });
+    return interaction.reply({ embeds: [embed] });
   },
 };
 
