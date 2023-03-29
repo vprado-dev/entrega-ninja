@@ -30,6 +30,7 @@
     "dotenv": "^16.0.3",
     "dotenv-safe": "^8.2.0",
     "fs-extra": "^11.1.1",
+    "knex": "^2.4.2",
     "node-cache": "^5.1.2",
     "node-fetch": "2"
   },
@@ -39,7 +40,12 @@
     "dev": "ts-node-dev --no-notify src/index.ts",
     "deploy-commands": "ts-node src/utils/deploy-commands.ts",
     "prepare": "husky install",
-    "docker": "./scripts/docker.js"
+    "docker": "./scripts/docker.js",
+    "migrate-down": "knex --knexfile ./database/knexfile.js migrate:down",
+    "migrate-latest": "knex --knexfile ./database/knexfile.js migrate:latest",
+    "migrate-make": "knex --knexfile ./database/knexfile.js migrate:make",
+    "migrate-rollback": "knex --knexfile ./database/knexfile.js migrate:rollback",
+    "migrate-up": "knex --knexfile ./database/knexfile.js migrate:up"
   },
   "lint-staged": {
     "*.{js,ts}": [
