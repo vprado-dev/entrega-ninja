@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { TrackingProps } from "../@types/TrackingProps";
-import { fetchTrackingService } from "../services/rastreioService";
 import { trackingEmbed } from "../views/trackingEmbed";
+import { getLastTrackingEvent } from "../functions/getLastTrackingEvent";
 
 const rastreio = {
   data: new SlashCommandBuilder()
@@ -14,8 +13,7 @@ const rastreio = {
     ),
   async execute(interaction: any) {
     const codigo = interaction.options.getString("codigo");
-    const rastreio = await fetchTrackingService(codigo);
-    const lastUpdate: TrackingProps = rastreio.eventos.reverse().pop();
+    const lastUpdate = await getLastTrackingEvent(codigo);
 
     const embed = trackingEmbed({
       descricao: lastUpdate.descricao,
