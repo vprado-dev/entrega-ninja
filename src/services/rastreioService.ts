@@ -2,6 +2,7 @@ import fetch from "node-fetch";
 import URLS from "../utils/URL";
 import { JSDOM } from "jsdom";
 import { getInfos } from "../utils/getInfos";
+import redis from "../config/redis";
 
 export const fetchTrackingService = async (code: string) => {
   const api = new URL(`${URLS.API_RASTREAR}`);
@@ -17,6 +18,7 @@ export const fetchTrackingService = async (code: string) => {
 };
 
 export const fetchTrackingServiceV2 = async (code: string) => {
+  console.log("[#LOG] Fetching track service");
   const response = await fetch(
     `https://www.muambator.com.br/pacotes/${code}/detalhes`,
   );
@@ -25,6 +27,8 @@ export const fetchTrackingServiceV2 = async (code: string) => {
   const dom = new JSDOM(html);
 
   const lastUpdate = getInfos(dom);
+
+  await redis.set(code, JSON.stringify(lastUpdate), "EX", 4 * 60 * 60);
 
   return lastUpdate;
 };

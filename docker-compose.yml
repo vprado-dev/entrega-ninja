@@ -1,4 +1,9 @@
-version: '3'
+version: "3"
+
+networks:
+  app-network:
+    driver: bridge
+
 services:
   bot:
     build: .
@@ -6,16 +11,32 @@ services:
     env_file:
       - .env
     restart: always
+    depends_on:
+      - cache
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+    networks:
+      - app-network
+
   cache:
     image: redis:alpine
     restart: always
     env_file:
       - .env
     ports:
-      - '$CACHE_PORT:$CACHE_PORT'
+      - "$CACHE_PORT:$CACHE_PORT"
     command: redis-server --save 20 1 --loglevel warning --requirepass $CACHE_PASSWORD
     volumes:
       - redis_data:/data
+    networks:
+      - app-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+
 
 volumes:
   redis_data:

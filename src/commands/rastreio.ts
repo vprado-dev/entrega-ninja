@@ -30,8 +30,6 @@ const rastreio = {
         );
       }
 
-      await redis.set(codigo, JSON.stringify(lastUpdate), "EX", 4 * 60 * 60);
-
       const embed = trackingEmbedV2({
         descricao: lastUpdate.descricao,
         dtHrCriado: lastUpdate.dtHrCriado,
