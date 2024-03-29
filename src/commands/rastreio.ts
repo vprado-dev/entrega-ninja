@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { TrackingProps } from "../@types/TrackingProps";
-import { fetchTrackingService } from "../services/rastreioService";
-import { trackingEmbed } from "../views/trackingEmbed";
+import { fetchTrackingServiceV2 } from "../services/rastreioService";
+import { trackingEmbedV2 } from "../views/trackingEmbed";
+import redis from "../config/redis";
 
 const rastreio = {
   data: new SlashCommandBuilder()
@@ -13,18 +13,36 @@ const rastreio = {
         .setDescription("O codigo de rastreio da sua encomenda"),
     ),
   async execute(interaction: any) {
-    const codigo = interaction.options.getString("codigo");
-    const rastreio = await fetchTrackingService(codigo);
-    const lastUpdate: TrackingProps = rastreio.eventos.reverse().pop();
+    try {
+      const codigo = interaction.options.getString("codigo");
+      const redisLastUpdate = await redis.get(codigo);
+      const lastUpdate = redisLastUpdate
+        ? JSON.parse(redisLastUpdate)
+        : await fetchTrackingServiceV2(codigo);
 
-    const embed = trackingEmbed({
-      descricao: lastUpdate.descricao,
-      dtHrCriado: lastUpdate.dtHrCriado,
-      unidade: lastUpdate.unidade,
-      unidadeDestino: lastUpdate.unidadeDestino,
-    });
+      if (
+        !lastUpdate.descricao ||
+        !lastUpdate.dtHrCriado ||
+        !lastUpdate.unidade
+      ) {
+        return interaction.reply(
+          "Parece que seu código expirou, ou não está mais cadastrado no sistema 😢",
+        );
+      }
 
-    return interaction.reply({ embeds: [embed] });
+      await redis.set(codigo, JSON.stringify(lastUpdate), "EX", 4 * 60 * 60);
+
+      const embed = trackingEmbedV2({
+        descricao: lastUpdate.descricao,
+        dtHrCriado: lastUpdate.dtHrCriado,
+        unidade: lastUpdate.unidade,
+        unidadeDestino: lastUpdate.unidadeDestino,
+      });
+
+      return interaction.reply({ embeds: [embed] });
+    } catch (err: any) {
+      console.error(`[#ERROR] ${err.message}`);
+    }
   },
 };
 

@@ -1,6 +1,5 @@
-enum URL {
-  PROXYAPP_RASTREAR = "https://proxyapp.correios.com.br/v1/sro-rastro",
-  PROXYAPP_TOKEN = "https://proxyapp.correios.com.br/v1/app-validation",
+enum URLS {
+  API_RASTREAR = "https://api.linketrack.com/track/json",
 }
 
-export default URL;
+export default URLS;

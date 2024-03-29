@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { EmbedBuilder } from "discord.js";
-import { TrackingProps } from "../@types/TrackingProps";
+import { TrackingProps, TrackingPropsV2 } from "../@types/TrackingProps";
 
 enum TipoUnidade {
   TCE = "Unidade de Tratamento",
@@ -50,6 +50,54 @@ export const trackingEmbed = ({
     fields.push({
       name: "Local",
       value: `${unidade.tipo} - ${unidade.endereco.cidade} (${unidade.endereco.uf})`,
+      inline: false,
+    });
+  }
+  const embedReply = new EmbedBuilder().setColor("#ea6329").addFields(fields);
+
+  return embedReply;
+};
+
+export const trackingEmbedV2 = ({
+  descricao,
+  dtHrCriado,
+  unidade,
+  unidadeDestino,
+}: TrackingPropsV2) => {
+  const fields = [
+    {
+      name: "Estado atual",
+      value: `**${descricao}**`,
+      inline: false,
+    },
+    {
+      name: "Data",
+      value: `${dtHrCriado[0]}`,
+      inline: true,
+    },
+    {
+      name: "Horário",
+      value: `${dtHrCriado[1]}`,
+      inline: true,
+    },
+  ];
+  if (unidadeDestino) {
+    fields.push(
+      {
+        name: "**Origem**",
+        value: `${unidade}`,
+        inline: false,
+      },
+      {
+        name: "**Destino**",
+        value: `${unidadeDestino}`,
+        inline: false,
+      },
+    );
+  } else {
+    fields.push({
+      name: "Local",
+      value: `${unidade}`,
       inline: false,
     });
   }
