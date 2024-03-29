@@ -1,50 +1,30 @@
-import NodeCache from "node-cache";
 import fetch from "node-fetch";
-import { parseJwt } from "../utils/parseJwt";
-import URL from "../utils/URL";
-
-const tokenCache = new NodeCache();
-
-const getToken = async () => {
-  let tokenObj: any = tokenCache.get("token");
-  if (tokenObj && tokenObj.expirationDate > Date.now()) {
-    return tokenObj;
-  }
-  const response = await fetch(URL.PROXYAPP_TOKEN, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "user-agent": "Dart/2.18 (dart:io)",
-    },
-    body: JSON.stringify({
-      requestToken: process.env.REQUEST_TOKEN,
-    }),
-  });
-
-  const body = await response.json();
-  const jwtObject = parseJwt(body.token);
-  tokenObj = {
-    token: body.token,
-    expirationDate: jwtObject.exp * 1000 - 120000,
-  };
-
-  tokenCache.set("token", tokenObj);
-
-  return tokenObj;
-};
+import URLS from "../utils/URL";
+import { JSDOM } from "jsdom";
+import { getInfos } from "../utils/getInfos";
 
 export const fetchTrackingService = async (code: string) => {
-  const tokenObj = await getToken();
+  const api = new URL(`${URLS.API_RASTREAR}`);
+  api.searchParams.append("user", process.env.CORREIOS_USER || "");
+  api.searchParams.append("token", process.env.CORREIOS_TOKEN || "");
+  api.searchParams.append("codigo", code);
 
-  const rastreioResponse = await fetch(`${URL.PROXYAPP_RASTREAR}/${code}`, {
-    headers: {
-      "content-type": "application/json",
-      "user-agent": "Dart/2.18 (dart:io)",
-      "app-check-token": tokenObj.token,
-    },
-  });
+  const rastreioResponse = await fetch(api.toString());
 
   const body = await rastreioResponse.json();
-
+  console.log({ eventos: body.eventos });
   return body.objetos[0];
+};
+
+export const fetchTrackingServiceV2 = async (code: string) => {
+  const response = await fetch(
+    `https://www.muambator.com.br/pacotes/${code}/detalhes`,
+  );
+  const html = await response.text();
+
+  const dom = new JSDOM(html);
+
+  const lastUpdate = getInfos(dom);
+
+  return lastUpdate;
 };

@@ -7,3 +7,10 @@ export interface TrackingProps {
   };
   unidadeDestino?: Record<string, any>;
 }
+
+export interface TrackingPropsV2 {
+  descricao: string;
+  dtHrCriado: string;
+  unidade: string;
+  unidadeDestino?: string;
+}

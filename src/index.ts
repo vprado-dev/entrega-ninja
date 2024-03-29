@@ -1,10 +1,10 @@
 import dotenv from "dotenv-safe";
 dotenv.config();
 
+import Redis from "./config/redis";
 import { Client, Collection, IntentsBitField } from "discord.js";
 import fs from "fs-extra";
 import path from "path";
-
 const client: any = new Client({ intents: [IntentsBitField.Flags.Guilds] });
 
 client.commands = new Collection();
@@ -38,6 +38,7 @@ const setup = async () => {
 
   client.on("error", (err: any) => console.error("[#ERROR]", err));
   client.login(process.env.AUTH_TOKEN);
+  console.log(`[#LOG] Redis connection status: ${Redis.status}`);
 };
 
 setup();
